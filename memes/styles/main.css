@@ -1,0 +1,72 @@
+@import url('https://fonts.googleapis.com/css2?family=Bangers&display=swap');
+
+#content{
+    display: flex;
+    flex-direction: column;
+}
+ body {
+        background-color: #C61611;
+     margin:0;
+ }
+ 
+.header{
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border-radius: 15px;
+    margin: 16px;
+    background:white;
+    justify-content: left;
+}
+
+.header #logo{
+    font-family: 'Bangers', cursive;
+    text-decoration: none;
+    color: #C61611;
+    font-size: 45px;
+    transition: font-size .3s;
+    margin-right: 16px;
+}
+
+.header #logo:hover{
+    font-size: 50px;
+}
+
+
+.footer{
+    display: flex;
+    align-items: center;
+    border-radius: 15px;
+    margin: 16px;
+
+    padding: 10px;
+    justify-content: center;
+    background: white;
+}
+.footer #copy{
+    text-decoration: none;
+    font-family: monospace;
+    color: black;
+    font-size: 15px;
+    transition: font-size 0.3s
+}
+
+.footer #copy:hover{
+    font-size: 20px;
+    
+}
+
+.hButton{
+    border-radius: 15px;
+    padding: 25px;
+    color: #C61611;
+    font-size: 20px;
+    font-family: 'Bangers', cursive;
+    text-decoration: none;
+    transition: background .2s;
+}
+.hButton:hover{
+    background: #C61611;
+    color: white;
+}
+
