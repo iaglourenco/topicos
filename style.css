@@ -1,0 +1,23 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito&display=swap');
+
+h1{
+    font-family: Nunito;
+    color: white
+}
+body{
+    background: #1E555C;
+    margin: 0;
+}
+
+a{
+    padding: 10px;
+    background: #8797B2;
+    border-radius: 15px;
+    text-decoration: none;
+    font-family: Nunito;
+    color: white
+}
+
+a:hover{
+    background: #A7A5C6;
+}
