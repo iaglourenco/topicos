@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <link
+    href="https://fonts.googleapis.com/css2?family=Nunito&display=swap"
+    rel="stylesheet"
+  />
+    <script type="text/javascript" charset="utf-8" src="script.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora</title>
+</head>
+<body>
+
+
+        <div id="container">
+
+
+        <form name="calc">
+            <input type="text" name="visor" id="visor">
+            <input type="button" value="C" id="clear" onclick="clearVisor()" >
+            <div id="buttons">
+                <input type="button" value="7" onclick="setVisor(value)">
+                <input type="button" value="8" onclick="setVisor(value)">
+                <input type="button" value="9" onclick="setVisor(value)">
+                <input type="button" value="4" onclick="setVisor(value)">
+                <input type="button" value="5" onclick="setVisor(value)">
+                <input type="button" value="6" onclick="setVisor(value)">
+                <input type="button" value="1" onclick="setVisor(value)">
+                <input type="button" value="2" onclick="setVisor(value)">
+                <input type="button" value="3" onclick="setVisor(value)">
+                <input type="button" value="+" id="add" onclick="setVisor(value)">
+                <input type="button" value="-" id="minus" onclick="setVisor(value)">
+                <input type="button" value="0" onclick="setVisor(value)">
+                <input type="button" value="/" id="div" onclick="setVisor(value)">
+                <input type="button" value="x" id="times" onclick="setVisor('*')">
+                <input type="button" value="=" id="equal" onclick="setVisor('=')">
+            </div>
+        </form>
+   
+    </div>
+    
+</body>
+</html>
