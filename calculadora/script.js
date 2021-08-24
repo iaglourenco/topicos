@@ -1,11 +1,27 @@
-function clearVisor(){
-    document.calc.visor.value=""
+function clearVisor() {
+  document.getElementById("visor").value = "";
 }
-function setVisor(str){
 
-    if(str == "=")
-        document.calc.visor.value = eval(document.calc.visor.value)    
+const regex = /[a-zA-Z'(){}]/im;
 
-    else 
-        document.calc.visor.value = document.calc.visor.value + str
+function setVisor(str) {
+  let currentVisor = document.getElementById("visor").value;
+
+  if (str == "=") {
+    if (currentVisor.length == 0) return;
+    document.getElementById("visor").value = currentVisor.match(regex)
+      ? "Error"
+      : eval(currentVisor);
+  } else if (
+    (currentVisor.length == 0 && !["/", "*", "-", "+"].includes(str)) ||
+    (currentVisor.length != 0 &&
+      ["/", "*", "-", "+"].includes(currentVisor[currentVisor.length - 1]) &&
+      !["/", "*", "-", "+"].includes(str)) ||
+    (currentVisor.length != 0 &&
+      !["/", "*", "-", "+"].includes(currentVisor[currentVisor.length - 1]))
+  ) {
+    document.getElementById("visor").value =
+      document.getElementById("visor").value + str;
+  }
 }
+

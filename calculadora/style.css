@@ -1,44 +1,73 @@
 body{
-    display: flex;
-    align-items: center;
-    justify-content:center;
-    margin: 0;
     background-color: #353A47;
-
 }
 
+#calc-container{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 350px;
+    height: 620px;
+    margin: auto;
+    margin-top: 100px;
+    background-color: #353A47;
+    box-shadow: #000 5px 5px 45px 10px;
+}
 
 
 #buttons{
+    width: 300px;
+    height: 500px;
     margin-top: 10px;
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
 }
 
-#buttons input{
+#buttons .number{
     padding: 10px;
     border-color: transparent;
     font-family: Nunito;
-    font-size: 24px;
+    font-size: 32px;
+    background-color: #8491A3;
+}
+#buttons .none{
+    border-color: transparent;
     background-color: #8491A3;
 }
 
-#buttons input:hover{
+#buttons .operation{
+    padding: 10px;
+    border-color: transparent;
+    font-family: Nunito;
+    font-size: 32px;
+    background-color: #8491A3;
+    
+}
+
+#buttons .number:hover, #buttons .operation:hover{
     background-color: #9CFC97;
 }
 
-#clear{
+
+#buttons #equal{
+    padding: 10px;
+    border-color: transparent;
+    font-family: Nunito;
+    font-size: 32px;
+    background-color: #8491A3;
+}
+
+#buttons #clear{
     padding: 10px;
     border-color: transparent;
     font-family: Nunito;
     font-size: 24px;
-    color: #000;
     background-color: #F02D3A;
 }
 
-#clear:hover{
+#buttons #clear:hover{
     background-color: #DD0426;
-
 }
 
 #buttons #equal:hover{
@@ -46,11 +75,10 @@ body{
 }
 
 #visor{
-    direction: rtl;
-    margin: 0;
-    padding: 10px;
+    width: 295px;
+    outline: none;
     font-family: Nunito;
-    font-size: 24px;
+    font-size: 35px;
 }
 
 

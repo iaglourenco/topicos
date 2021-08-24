@@ -1,46 +1,134 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<head>
+  <head>
     <link
-    href="https://fonts.googleapis.com/css2?family=Nunito&display=swap"
-    rel="stylesheet"
-  />
+      href="https://fonts.googleapis.com/css2?family=Nunito&display=swap"
+      rel="stylesheet"
+    />
     <script type="text/javascript" charset="utf-8" src="script.js"></script>
-    <link rel="stylesheet" href="style.css">
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Calculadora</title>
-</head>
-<body>
+  </head>
+  <body>
+    <div id="calc-container">
+      <div id="visor-container">
+        <input type="text" name="visor" id="visor" />
+      </div>
 
+      <div id="buttons">
+        <input type="button" value="CE" id="clear" onclick="clearVisor()" />
+        <input type="button" value="" class="none" />
+        <input type="button" value="" class="none" />
 
-        <div id="container">
+        <input
+          type="button"
+          value="&#247;"
+          class="operation"
+          onclick="setVisor('/')"
+        />
 
+        <input
+          type="button"
+          value="7"
+          class="number"
+          onclick="setVisor(value)"
+        />
+        <input
+          type="button"
+          value="8"
+          class="number"
+          onclick="setVisor(value)"
+        />
+        <input
+          type="button"
+          value="9"
+          class="number"
+          onclick="setVisor(value)"
+        />
 
-        <form name="calc">
-            <input type="text" name="visor" id="visor">
-            <input type="button" value="C" id="clear" onclick="clearVisor()" >
-            <div id="buttons">
-                <input type="button" value="7" onclick="setVisor(value)">
-                <input type="button" value="8" onclick="setVisor(value)">
-                <input type="button" value="9" onclick="setVisor(value)">
-                <input type="button" value="4" onclick="setVisor(value)">
-                <input type="button" value="5" onclick="setVisor(value)">
-                <input type="button" value="6" onclick="setVisor(value)">
-                <input type="button" value="1" onclick="setVisor(value)">
-                <input type="button" value="2" onclick="setVisor(value)">
-                <input type="button" value="3" onclick="setVisor(value)">
-                <input type="button" value="+" id="add" onclick="setVisor(value)">
-                <input type="button" value="-" id="minus" onclick="setVisor(value)">
-                <input type="button" value="0" onclick="setVisor(value)">
-                <input type="button" value="/" id="div" onclick="setVisor(value)">
-                <input type="button" value="x" id="times" onclick="setVisor('*')">
-                <input type="button" value="=" id="equal" onclick="setVisor('=')">
-            </div>
-        </form>
-   
+        <input
+          type="button"
+          value="x"
+          class="operation"
+          onclick="setVisor('*')"
+        />
+
+        <input
+          type="button"
+          value="4"
+          class="number"
+          onclick="setVisor(value)"
+        />
+        <input
+          type="button"
+          value="5"
+          class="number"
+          onclick="setVisor(value)"
+        />
+        <input
+          type="button"
+          value="6"
+          class="number"
+          onclick="setVisor(value)"
+        />
+
+        <input
+          type="button"
+          value="-"
+          class="operation"
+          onclick="setVisor(value)"
+        />
+
+        <input
+          type="button"
+          value="1"
+          class="number"
+          onclick="setVisor(value)"
+        />
+        <input
+          type="button"
+          value="2"
+          class="number"
+          onclick="setVisor(value)"
+        />
+        <input
+          type="button"
+          value="3"
+          class="number"
+          onclick="setVisor(value)"
+        />
+
+        <input
+          type="button"
+          value="+"
+          class="operation"
+          onclick="setVisor(value)"
+        />
+
+        <input type="button" value="," class="number" onclick="setVisor('.')" />
+        <input
+          type="button"
+          class="number"
+          value="0"
+          onclick="setVisor(value)"
+        />
+        <input type="button" value="00" class="number" onclick="setVisor(value)" />
+
+        <input type="button" value="=" id="equal" onclick="setVisor('=')" />
+      </div>
     </div>
-    
-</body>
+    <script>
+      document
+        .getElementById("visor")
+        .addEventListener("keyup", function (evt) {
+          evt.preventDefault();
+          if (evt.keyCode == 13) {
+            document.getElementById("equal").click();
+          }
+        });
+    </script>
+  </body>
 </html>
