@@ -7,63 +7,93 @@ body{
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    width: 350px;
-    height: 620px;
+    width: 400px;
+    height: 650px;
     margin: auto;
     margin-top: 100px;
     background-color: #353A47;
     box-shadow: #000 5px 5px 45px 10px;
 }
 
+#visor{
+    margin-top: 30px;
+    width: 320px;
+    height: 50px;
+    outline: none;
+    font-family: monospace;
+    font-size: 35px;
+}
+
+
 
 #buttons{
-    width: 300px;
+    width: auto;
     height: 500px;
-    margin-top: 10px;
+    margin: 30px;
     display: grid;
+    row-gap: 15px;
+    column-gap: 5px;
     grid-template-columns: 1fr 1fr 1fr 1fr;
 }
 
 #buttons .number{
-    padding: 10px;
-    border-color: transparent;
+    padding: 15px 25px;
     font-family: Nunito;
     font-size: 32px;
     background-color: #8491A3;
+    border-radius: 15px;
+    border: none;
+    outline: none;
+    color: white;
+    box-shadow: 0 9px #999;
 }
+
 #buttons .none{
+    padding: 15px 25px;
     border-color: transparent;
-    background-color: #8491A3;
+    background-color: #353A47;
 }
 
 #buttons .operation{
-    padding: 10px;
-    border-color: transparent;
+    padding: 15px 25px;
     font-family: Nunito;
     font-size: 32px;
     background-color: #8491A3;
-    
+    border-radius: 15px;
+    border: none;
+    outline: none;
+    box-shadow: 0 9px #999;
+    color: white;
+
+}
+
+#buttons #equal{
+    padding: 15px 25px;
+    font-family: Nunito;
+    font-size: 32px;
+    background-color: #8491A3;
+    border-radius: 15px;
+    border: none;
+    outline: none;
+    box-shadow: 0 9px #999;
+    color: white;
+
+}
+
+#buttons #clear{
+    padding: 15px 25px;
+    border-radius: 15px;
+    border: none;
+    outline: none;
+    box-shadow: 0 9px #999;
+    font-family: Nunito;
+    font-size: 24px;
+    background-color: #F02D3A;
 }
 
 #buttons .number:hover, #buttons .operation:hover{
     background-color: #9CFC97;
-}
 
-
-#buttons #equal{
-    padding: 10px;
-    border-color: transparent;
-    font-family: Nunito;
-    font-size: 32px;
-    background-color: #8491A3;
-}
-
-#buttons #clear{
-    padding: 10px;
-    border-color: transparent;
-    font-family: Nunito;
-    font-size: 24px;
-    background-color: #F02D3A;
 }
 
 #buttons #clear:hover{
@@ -74,11 +104,19 @@ body{
     background-color: #57C4E5
 }
 
-#visor{
-    width: 295px;
-    outline: none;
-    font-family: Nunito;
-    font-size: 35px;
+#buttons #equal:active, #buttons #clear:active{
+    background-color: #DD0426;
+    box-shadow: 0 5px #666;
+    transform: translateY(4px);
+    
 }
+
+#buttons .number:active, #buttons .operation:active{
+  background-color: #3e8e41;
+  box-shadow: 0 5px #666;
+  transform: translateY(4px);
+}
+
+
 
 
