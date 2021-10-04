@@ -1,0 +1,46 @@
+td {
+    width: 50pt;
+    height: 50pt;
+    font-size: 3rem;
+    transition: background-color .3s ease-in-out
+}
+
+td:hover{
+    background-color:#97C8EB;
+    cursor: pointer;
+}
+
+table {
+    text-align: center;
+    font-family: "Arial Unicode MS";
+    border-collapse: collapse;
+}
+
+body{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #093A3E
+}
+
+.button a{
+    text-decoration:none;
+    color: white;
+}
+
+.button{
+    cursor: pointer;
+    color: white;
+    width:15%;
+    margin: 16;
+    font-size: 1.5rem;
+    border: none;
+    border-radius: 15;
+    background-color: #3AAFB9;
+    transition: all 0.3s ease-in-out
+}
+
+.button:hover{
+    background: #513B3C;
+
+}

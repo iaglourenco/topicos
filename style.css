@@ -14,6 +14,8 @@ body{
 
 a{
     padding: 10px;
+    width: 20vw;
+    text-align: center;
     background: #8797B2;
     border-radius: 15px;
     text-decoration: none;
@@ -24,4 +26,13 @@ a{
 
 a:hover{
     background: #A7A5C6;
+}
+
+.buttons{
+    margin-top: 12px;
+    padding: 30px;
+    border: solid #8797B2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
