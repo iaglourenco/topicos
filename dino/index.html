@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Dino</title>
+        <style>
+            html,
+            body {
+                height: 100%;
+            }
+
+            html {
+                display: table;
+                margin: auto;
+            }
+
+            body,
+            a {
+                display: table-cell;
+                vertical-align: middle;
+            }
+            a {
+                text-decoration: none;
+                background-color: #535353;
+                color: white;
+                padding: 10px;
+                font-family: Consolas;
+            }
+        </style>
+    </head>
+
+    <body onkeydown="OnKeyDown(event)">
+        <img id="dino" width="0" height="0" src="./img/trex1.png" />
+        <img id="cactus1" width="0" height="0" src="./img/cactus1.png" />
+        <img id="cactus2" width="0" height="0" src="./img/cactus2.png" />
+        <img id="cactus3" width="0" height="0" src="./img/cactus3.png" />
+        <img id="fuck" width="0" height="0" src="./img/fuck.png" />
+        <canvas id="myCanvas" width="800" height="600"></canvas>
+
+        <script>
+            var x = 30;
+            var y = 500;
+            var cactusX = 900;
+
+            var cactus = [
+                {
+                    src: document.getElementById("cactus1"),
+                    width: 50,
+                },
+                {
+                    src: document.getElementById("cactus2"),
+                    width: 98,
+                },
+                {
+                    src: document.getElementById("cactus3"),
+                    width: 104,
+                },
+            ];
+            var c = document.getElementById("myCanvas");
+            var ctx = c.getContext("2d");
+
+            var dino = document.getElementById("dino");
+            var fuck = document.getElementById("fuck");
+            var jumping = false;
+            var score = 0;
+            var record = 0;
+            var crashed = false;
+            var random = Math.floor(Math.random() * cactus.length);
+            function OnKeyDown(event) {
+                if (crashed && event.key == " ") {
+                    crashed = false;
+                    upd = setInterval(Update, 1);
+                    grav = setInterval(gravity, 25);
+                    x = 30;
+                    y = 500;
+                    cactusX = 900;
+                    record = score > record ? score : record;
+                    score = 0;
+                }
+
+                jumping = event.key == "w" && !event.repeat && y == 500;
+            }
+
+            function gravity() {
+                if (y < 500) y += 10;
+            }
+            function Update() {
+                ctx.clearRect(0, 0, 800, 600);
+                ctx.font = "20px Consolas";
+                ctx.fillText(`RECORDE: ${record} SCORE: ${score}`, 500, 50);
+                if (cactusX === 900) {
+                    random = Math.floor(Math.random() * cactus.length);
+                }
+                ctx.drawImage(
+                    cactus[random].src,
+                    cactusX,
+                    500,
+                    cactus[random].width,
+                    105
+                );
+                ctx.fillStyle = "#535353";
+                ctx.fillRect(0, 560, 800, 2);
+
+                if (y >= 300 && jumping) y -= 10;
+                else jumping = false;
+                ctx.drawImage(dino, x, y, 88, 85);
+
+                cactusX = cactusX > -30 ? cactusX - 2 : 900;
+
+                if (
+                    x >= cactusX - 80 &&
+                    x <= cactusX + 80 &&
+                    y <= 500 &&
+                    y >= 420
+                ) {
+                    ctx.clearRect(x + 47, y + 5, 10, 10);
+                    ctx.drawImage(fuck, x, y, 88, 85);
+                    crashed = true;
+                    ctx.font = "36px Consolas";
+                    ctx.fillText("Morreu, espaço para reiniciar!", 100, 200);
+                    clearInterval(upd);
+                    clearInterval(grav);
+                }
+                if (cactusX == -30 && !crashed) {
+                    score += 1;
+                    record = score > record ? score : record;
+                }
+            }
+
+            if (!crashed) {
+                var upd = setInterval(Update, 1);
+                var grav = setInterval(gravity, 25);
+            }
+        </script>
+        <a href="https://github.com/iaglourenco">Feito por @iaglourenco</a>
+    </body>
+</html>
