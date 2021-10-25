@@ -32,7 +32,10 @@
     </head>
 
     <body onkeydown="OnKeyDown(event)">
-        <img id="dino" width="0" height="0" src="./img/trex1.png" />
+        <img id="trex1" width="0" height="0" src="./img/trex1.png" />
+        <img id="trex2" width="0" height="0" src="./img/trex2.png" />
+        <img id="trex3" width="0" height="0" src="./img/trex3.png" />
+        <img id="trex4" width="0" height="0" src="./img/trex4.png" />
         <img id="cactus1" width="0" height="0" src="./img/cactus1.png" />
         <img id="cactus2" width="0" height="0" src="./img/cactus2.png" />
         <img id="cactus3" width="0" height="0" src="./img/cactus3.png" />
@@ -61,9 +64,24 @@
             var c = document.getElementById("myCanvas");
             var ctx = c.getContext("2d");
 
-            var dino = document.getElementById("dino");
+            var trex = [
+                {
+                    src: document.getElementById("trex1"),
+                },
+                {
+                    src: document.getElementById("trex2"),
+                },
+                {
+                    src: document.getElementById("trex3"),
+                },
+                {
+                    src: document.getElementById("trex4"),
+                },
+            ];
+
             var fuck = document.getElementById("fuck");
             var jumping = false;
+            var i = 1;
             var score = 0;
             var record = 0;
             var crashed = false;
@@ -83,13 +101,31 @@
                 jumping = event.key == "w" && !event.repeat && y == 500;
             }
 
+            function rectIntersect(x1, y1, w1, h1, x2, y2, w2, h2) {
+                // Check x and y for overlap
+                if (
+                    x2 > w1 + x1 ||
+                    x1 > w2 + x2 ||
+                    y2 > h1 + y1 ||
+                    y1 > h2 + y2
+                ) {
+                    return false;
+                }
+                return true;
+            }
+
+            function drawTrex(x, y, w, h, anim) {
+                if (y < 500) {
+                    ctx.drawImage(trex[0].src, x, y, w, h);
+                } else ctx.drawImage(trex[anim].src, x, y, w, h);
+            }
             function gravity() {
                 if (y < 500) y += 10;
             }
             function Update() {
                 ctx.clearRect(0, 0, 800, 600);
                 ctx.font = "20px Consolas";
-                ctx.fillText(`RECORDE: ${record} SCORE: ${score}`, 500, 50);
+                ctx.fillText(`RECORDE: ${record} PONTOS: ${score}`, 500, 50);
                 if (cactusX === 900) {
                     random = Math.floor(Math.random() * cactus.length);
                 }
@@ -105,15 +141,26 @@
 
                 if (y >= 300 && jumping) y -= 10;
                 else jumping = false;
-                ctx.drawImage(dino, x, y, 88, 85);
+
+                drawTrex(x, y, 88, 85, i);
 
                 cactusX = cactusX > -30 ? cactusX - 2 : 900;
 
+                // ctx.fillStyle = "red";
+                // ctx.fillRect(x + 5, y + 5, 70, 75);
+                // ctx.fillRect(cactusX, 500, cactus[random].width, 105);
+
                 if (
-                    x >= cactusX - 80 &&
-                    x <= cactusX + 80 &&
-                    y <= 500 &&
-                    y >= 420
+                    rectIntersect(
+                        x + 5,
+                        y + 5,
+                        70,
+                        75,
+                        cactusX,
+                        500,
+                        cactus[random].width,
+                        cactus[random].height
+                    )
                 ) {
                     ctx.clearRect(x + 47, y + 5, 10, 10);
                     ctx.drawImage(fuck, x, y, 88, 85);
@@ -132,6 +179,7 @@
             if (!crashed) {
                 var upd = setInterval(Update, 1);
                 var grav = setInterval(gravity, 25);
+                setInterval(() => (i = i === 3 ? 2 : i + 1), 250);
             }
         </script>
         <a href="https://github.com/iaglourenco">Feito por @iaglourenco</a>
