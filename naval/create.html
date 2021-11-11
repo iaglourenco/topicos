@@ -9,12 +9,91 @@
     </head>
     <body>
         <h1>Naval</h1>
-        <form action="/create" method="POST">
-            <label for="pass">Room pass</label>
-            <input type="text" name="pass" id="pass" required />
-            <button type="submit">Create</button>
-        </form>
+
+        <div class="create-board-header">
+            <label>Your board</label>
+            <span onclick="getBoard()">Randomize</span>
+        </div>
+        <div id="container">
+            <div id="my-board"></div>
+        </div>
+        <label for="pass">Room pass</label>
+        <input type="text" name="pass" id="pass" required />
+        <input type="hidden" name="board" id="board" />
+        <a onclick="goToGame()">Create</a>
 
         <a href="/">Back</a>
+
+        <script>
+            var generateBoard = new XMLHttpRequest();
+            generateBoard.open(
+                "GET",
+                "http://localhost:3000/generate_board",
+                true
+            );
+            var createGame = new XMLHttpRequest();
+            createGame.open("POST", "http://localhost:3000/create/", true);
+            createGame.setRequestHeader(
+                "Content-Type",
+                "application/x-www-form-urlencoded"
+            );
+            function getBoard() {
+                generateBoard.send();
+                generateBoard.onload = () => {
+                    if (generateBoard.status === 200) {
+                        var response = JSON.parse(generateBoard.responseText);
+                        var myBoard = response.board;
+
+                        var html = "<table cellpadding=0 cellspacing=0>";
+                        for (let row = 0; row < response.rows; row++) {
+                            html += "<tr>";
+                            for (
+                                let column = 0;
+                                column < response.cols;
+                                column++
+                            ) {
+                                const pixelIndex = column + response.cols * row;
+                                html += "<td>";
+                                html += `<div class="pixel-index">${pixelIndex}</div>`;
+                                if (response.board[pixelIndex] != -1)
+                                    html += `${myBoard[pixelIndex]}`;
+
+                                html += "</td>";
+                            }
+                            html += "</tr>";
+                        }
+                        html += "</table>";
+                        document.getElementById("my-board").innerHTML = html;
+                        document.getElementById("board").value = myBoard;
+                    } else {
+                        alert(
+                            "Failed to generate board!",
+                            generateBoard.statusText
+                        );
+                    }
+                    generateBoard.abort();
+                };
+            }
+
+            function goToGame() {
+                createGame.send(
+                    "pass=" +
+                        document.getElementById("pass").value +
+                        "&board=" +
+                        document.getElementById("board").value
+                );
+                createGame.onload = () => {
+                    if (createGame.status === 200) {
+                        var response = JSON.parse(createGame.responseText);
+                        window.location.href =
+                            "/game/" + response.id + "?pass=" + response.pass;
+                    } else {
+                        alert("Failed to create room!", createGame.statusText);
+                    }
+                };
+            }
+
+            getBoard();
+        </script>
     </body>
 </html>

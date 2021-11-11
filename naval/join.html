@@ -9,14 +9,64 @@
     </head>
     <body>
         <h1>Naval</h1>
+
+        <div class="create-board-header">
+            <label>Your board</label>
+            <span onclick="getBoard()">Randomize</span>
+        </div>
+
+        <div id="container">
+            <div id="my-board"></div>
+        </div>
         <form action="/join" method="POST">
             <label for>Room id</label>
-            <input type="text" name="id" required />
+            <input type="text" name="room_id" required />
             <label for="pass">Room pass</label>
             <input type="password" name="pass" required />
             <button type="submit">Join</button>
         </form>
 
         <a href="/">Back</a>
+
+        <script>
+            var request = new XMLHttpRequest();
+
+            function getBoard() {
+                request.open(
+                    "GET",
+                    "http://localhost:3000/generate_board",
+                    true
+                );
+
+                request.send();
+            }
+            getBoard();
+            request.onload = () => {
+                if (request.status === 200) {
+                    var response = JSON.parse(request.responseText);
+                    console.log(response);
+
+                    var html = "<table cellpadding=0 cellspacing=0>";
+                    for (let row = 0; row < response.rows; row++) {
+                        html += "<tr>";
+                        for (let column = 0; column < response.cols; column++) {
+                            const pixelIndex = column + response.cols * row;
+                            html += "<td>";
+                            html += `<div class="pixel-index">${pixelIndex}</div>`;
+                            if (response.board[pixelIndex] != -1)
+                                html += `${response.board[pixelIndex]}`;
+
+                            html += "</td>";
+                        }
+                        html += "</tr>";
+                    }
+                    html += "</table>";
+                    document.getElementById("my-board").innerHTML = html;
+                } else {
+                    alert("Failed to generate board!", request.statusText);
+                }
+            };
+            request.send();
+        </script>
     </body>
 </html>
