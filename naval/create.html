@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
     <head>
+        <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
         <link rel="stylesheet" href="/style.css" />
         <meta charset="UTF-8" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -20,42 +21,30 @@
         <label for="pass">Room pass</label>
         <input type="text" name="pass" id="pass" required />
         <input type="hidden" name="board" id="board" />
-        <a onclick="goToGame()">Create</a>
+        <a onclick="createGame()">Create</a>
 
         <a href="/">Back</a>
 
         <script>
-            var generateBoard = new XMLHttpRequest();
-            generateBoard.open(
-                "GET",
-                "http://localhost:3000/generate_board",
-                true
-            );
-            var createGame = new XMLHttpRequest();
-            createGame.open("POST", "http://localhost:3000/create/", true);
-            createGame.setRequestHeader(
-                "Content-Type",
-                "application/x-www-form-urlencoded"
-            );
+            var myBoard = [];
             function getBoard() {
-                generateBoard.send();
-                generateBoard.onload = () => {
-                    if (generateBoard.status === 200) {
-                        var response = JSON.parse(generateBoard.responseText);
-                        var myBoard = response.board;
+                axios
+                    .get("/generate_board")
+                    .then((res) => {
+                        myBoard = res.data.board;
 
                         var html = "<table cellpadding=0 cellspacing=0>";
-                        for (let row = 0; row < response.rows; row++) {
+                        for (let row = 0; row < res.data.rows; row++) {
                             html += "<tr>";
                             for (
                                 let column = 0;
-                                column < response.cols;
+                                column < res.data.cols;
                                 column++
                             ) {
-                                const pixelIndex = column + response.cols * row;
+                                const pixelIndex = column + res.data.cols * row;
                                 html += "<td>";
                                 html += `<div class="pixel-index">${pixelIndex}</div>`;
-                                if (response.board[pixelIndex] != -1)
+                                if (myBoard[pixelIndex] != -1)
                                     html += `${myBoard[pixelIndex]}`;
 
                                 html += "</td>";
@@ -64,33 +53,32 @@
                         }
                         html += "</table>";
                         document.getElementById("my-board").innerHTML = html;
-                        document.getElementById("board").value = myBoard;
-                    } else {
-                        alert(
-                            "Failed to generate board!",
-                            generateBoard.statusText
-                        );
-                    }
-                    generateBoard.abort();
-                };
+                    })
+                    .catch((error) => {
+                        alert("Failed to generate board!");
+                        console.log(error);
+                    });
             }
 
-            function goToGame() {
-                createGame.send(
-                    "pass=" +
-                        document.getElementById("pass").value +
-                        "&board=" +
-                        document.getElementById("board").value
-                );
-                createGame.onload = () => {
-                    if (createGame.status === 200) {
-                        var response = JSON.parse(createGame.responseText);
+            function createGame() {
+                let pass = document.getElementById("pass").value;
+
+                axios
+                    .post("/create", {
+                        board: myBoard,
+                        pass: pass,
+                    })
+                    .then((res) => {
                         window.location.href =
-                            "/game/" + response.id + "?pass=" + response.pass;
-                    } else {
-                        alert("Failed to create room!", createGame.statusText);
-                    }
-                };
+                            "/play?room_id=" +
+                            res.data.room_id +
+                            "&pass=" +
+                            pass;
+                    })
+                    .catch((error) => {
+                        alert("Failed to create game!");
+                        console.log(error);
+                    });
             }
 
             getBoard();

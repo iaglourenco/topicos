@@ -19,21 +19,6 @@ app.get("/create", (req, res) => {
 
 // API
 
-// Returns the board for the room_id
-app.get("/game/:room_id", (req, res) => {
-    const id = req.params.room_id;
-    const pass = req.query.pass;
-
-    if (games[id] === undefined) {
-        res.status(404).sendFile(__dirname + "/404.html");
-    } else if (games[id].pass !== pass) {
-        res.status(403).sendFile(__dirname + "/403.html");
-    } else {
-        res.send(games[id]);
-        console.log(games[id]);
-    }
-});
-
 //Creates a new game, and returns the game id and the player_id
 app.post("/create", (req, res) => {
     let id =
@@ -43,6 +28,8 @@ app.post("/create", (req, res) => {
     games[id] = {
         game: new game.Game(req.body.board, []),
         pass: req.body.pass,
+        cols: game.COLS,
+        rows: game.ROWS,
         players: 1,
         currentPlayer: 1,
     };
@@ -52,21 +39,42 @@ app.post("/create", (req, res) => {
     console.log(`Number of rooms: ${n_games}`);
 });
 
+app.get("/play", (req, res) => {
+    let id = req.query.room_id;
+    let pass = req.query.pass;
+
+    if (games[id] === undefined) {
+        res.sendFile(__dirname + "/404.html");
+    } else if (games[id].pass !== pass) {
+        res.sendFile(__dirname + "/403.html");
+    } else {
+        res.sendFile(__dirname + "/game.html");
+    }
+});
+
+app.get("/board/:room_id", (req, res) => {
+    let id = req.params.room_id;
+    if (games[id] === undefined) {
+        res.send({ error: "Room not found" });
+    } else {
+        res.send(games[id]);
+    }
+});
+
 //Join a game if the pass and ids are valid,returns the room_id and the player_id
 app.post("/join", (req, res) => {
     let id = req.body.room_id;
-    if (
-        games[id] === undefined ||
-        games[id].players === 2 ||
-        games[id].pass !== req.body.pass
-    ) {
-        res.status(403).sendFile(__dirname + "/403.html");
+
+    if (games[id] === undefined) {
+        res.sendFile(__dirname + "/404.html");
+    } else if (games[id].players === 2 || games[id].pass !== req.body.pass) {
+        res.sendFile(__dirname + "/403.html");
     } else {
-        games[id].players = 2;
-        res.send({
-            room_id: id,
-            player_id: "p2",
-        });
+        games[id].players += 1;
+        console.log(games[id].game);
+
+        games[id].game.setEnemyBoard(req.body.board);
+        res.send({ room_id: id, pass: req.body.pass, player_id: "p2" });
         console.log("Room joined: " + id);
     }
 });

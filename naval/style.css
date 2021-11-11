@@ -10,6 +10,11 @@ form {
     align-items: top;
 }
 
+#my-board,
+#enemy-board {
+    margin: 20px;
+}
+
 input,
 label {
     font-family: monospace;

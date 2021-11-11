@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
     <head>
+        <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
         <link rel="stylesheet" href="style.css" />
         <meta charset="UTF-8" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -18,55 +20,71 @@
         <div id="container">
             <div id="my-board"></div>
         </div>
-        <form action="/join" method="POST">
-            <label for>Room id</label>
-            <input type="text" name="room_id" required />
-            <label for="pass">Room pass</label>
-            <input type="password" name="pass" required />
-            <button type="submit">Join</button>
-        </form>
+        <label for>Room id</label>
+        <input type="text" name="room_id" id="room_id" required />
+        <label for="pass">Room pass</label>
+        <input type="password" name="pass" id="pass" required />
+        <a onclick="joinRoom()">Join</a>
 
         <a href="/">Back</a>
 
         <script>
-            var request = new XMLHttpRequest();
-
+            var myBoard = [];
             function getBoard() {
-                request.open(
-                    "GET",
-                    "http://localhost:3000/generate_board",
-                    true
-                );
+                axios
+                    .get("/generate_board")
+                    .then((res) => {
+                        myBoard = res.data.board;
 
-                request.send();
+                        var html = "<table cellpadding=0 cellspacing=0>";
+                        for (let row = 0; row < res.data.rows; row++) {
+                            html += "<tr>";
+                            for (
+                                let column = 0;
+                                column < res.data.cols;
+                                column++
+                            ) {
+                                const pixelIndex = column + res.data.cols * row;
+                                html += "<td>";
+                                html += `<div class="pixel-index">${pixelIndex}</div>`;
+                                if (myBoard[pixelIndex] != -1)
+                                    html += `${myBoard[pixelIndex]}`;
+
+                                html += "</td>";
+                            }
+                            html += "</tr>";
+                        }
+                        html += "</table>";
+                        document.getElementById("my-board").innerHTML = html;
+                    })
+                    .catch((error) => {
+                        alert("Failed to generate board!");
+                        console.log(error);
+                    });
+            }
+
+            function joinRoom() {
+                let pass = document.getElementById("pass").value;
+                let room_id = document.getElementById("room_id").value;
+                axios
+                    .post("/join", {
+                        room_id: room_id,
+                        pass: pass,
+                        board: myBoard,
+                    })
+                    .then((res) => {
+                        window.location.href =
+                            "/play?room_id=" +
+                            document.getElementById("room_id").value +
+                            "&pass=" +
+                            document.getElementById("pass").value;
+                    })
+                    .catch((error) => {
+                        alert("Failed to join room!");
+                        console.log(error);
+                    });
             }
             getBoard();
-            request.onload = () => {
-                if (request.status === 200) {
-                    var response = JSON.parse(request.responseText);
-                    console.log(response);
-
-                    var html = "<table cellpadding=0 cellspacing=0>";
-                    for (let row = 0; row < response.rows; row++) {
-                        html += "<tr>";
-                        for (let column = 0; column < response.cols; column++) {
-                            const pixelIndex = column + response.cols * row;
-                            html += "<td>";
-                            html += `<div class="pixel-index">${pixelIndex}</div>`;
-                            if (response.board[pixelIndex] != -1)
-                                html += `${response.board[pixelIndex]}`;
-
-                            html += "</td>";
-                        }
-                        html += "</tr>";
-                    }
-                    html += "</table>";
-                    document.getElementById("my-board").innerHTML = html;
-                } else {
-                    alert("Failed to generate board!", request.statusText);
-                }
-            };
-            request.send();
         </script>
     </body>
 </html>

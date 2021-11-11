@@ -7,6 +7,13 @@ class Game {
         this.enemyBoard = enemyBoard;
     }
 
+    setMyBoard(board) {
+        this.myBoard = board;
+    }
+
+    setEnemyBoard(board) {
+        this.enemyBoard = board;
+    }
     shoot(x, y) {}
 }
 

@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
+        <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
         <link rel="stylesheet" href="style.css" />
         <meta charset="UTF-8" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -8,9 +9,72 @@
         <title>Game</title>
     </head>
     <body>
+        <h1>Naval</h1>
+        <label id="room_id"></label>
         <div id="container">
             <div id="my-board"></div>
             <div id="enemy-board"></div>
         </div>
+
+        <script>
+            function parseQuery(queryString) {
+                var query = {};
+                var pairs = (
+                    queryString[0] === "?" ? queryString.substr(1) : queryString
+                ).split("&");
+                for (var i = 0; i < pairs.length; i++) {
+                    var pair = pairs[i].split("=");
+                    query[decodeURIComponent(pair[0])] = decodeURIComponent(
+                        pair[1] || ""
+                    );
+                }
+                return query;
+            }
+
+            var query = parseQuery(window.location.search);
+            document.getElementById("room_id").innerHTML =
+                "Room ID: " + query.room_id;
+            function getGame() {
+                axios.get("/board/" + query.room_id).then((response) => {
+                    setBoard(
+                        "my-board",
+                        response.data.game.myBoard,
+                        response.data.cols,
+                        response.data.rows
+                    );
+                    setBoard(
+                        "enemy-board",
+                        response.data.game.enemyBoard,
+                        response.data.cols,
+                        response.data.rows
+                    );
+                });
+            }
+
+            function performShoot(index, board_id) {
+                console.log("Shoot at " + index + " on " + board_id);
+            }
+            function setBoard(id, board, board_cols, board_rows) {
+                var html = "<table cellpadding=0 cellspacing=0>";
+                for (let row = 0; row < board_rows; row++) {
+                    html += "<tr>";
+                    for (let column = 0; column < board_cols; column++) {
+                        const pixelIndex = column + board_cols * row;
+                        html += `<td onclick="performShoot(${pixelIndex},'${id}')">`;
+                        html += `<div class="pixel-index">${pixelIndex}</div>`;
+                        if (board[pixelIndex] != -1)
+                            html += `${board[pixelIndex]}`;
+
+                        html += "</td>";
+                    }
+                    html += "</tr>";
+                }
+                html += "</table>";
+                document.getElementById(id).innerHTML = html;
+            }
+
+            getGame();
+            // setInterval(getGame, 1000);
+        </script>
     </body>
 </html>
