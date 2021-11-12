@@ -12,7 +12,7 @@
         <h1>Naval</h1>
 
         <div class="create-board-header">
-            <label>Your board</label>
+            <label>Set your board</label>
             <span onclick="getBoard()">Randomize</span>
         </div>
         <div id="container">
@@ -63,17 +63,26 @@
             function createGame() {
                 let pass = document.getElementById("pass").value;
 
+                if (pass === undefined || pass === "") {
+                    alert("Please enter a room pass!");
+                    return;
+                }
                 axios
                     .post("/create", {
                         board: myBoard,
                         pass: pass,
                     })
                     .then((res) => {
-                        window.location.href =
-                            "/play?room_id=" +
-                            res.data.room_id +
-                            "&pass=" +
-                            pass;
+                        let encoded = window.btoa(
+                            "?room_id=" +
+                                res.data.room_id +
+                                "&pass=" +
+                                pass +
+                                "&player_id=" +
+                                res.data.player_id
+                        );
+
+                        window.location.href = "/play?id=" + encoded;
                     })
                     .catch((error) => {
                         alert("Failed to create game!");

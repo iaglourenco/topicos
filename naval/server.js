@@ -17,31 +17,16 @@ app.get("/create", (req, res) => {
     res.sendFile(__dirname + "/create.html");
 });
 
-// API
-
-//Creates a new game, and returns the game id and the player_id
-app.post("/create", (req, res) => {
-    let id =
-        Math.random().toString(36).substring(2, 5) +
-        Math.random().toString(36).substring(2, 5);
-
-    games[id] = {
-        game: new game.Game(req.body.board, []),
-        pass: req.body.pass,
-        cols: game.COLS,
-        rows: game.ROWS,
-        players: 1,
-        currentPlayer: 1,
-    };
-    res.send({ room_id: id, pass: req.body.pass, player_id: "p1" });
-    n_games++;
-    console.log("Room created:", id);
-    console.log(`Number of rooms: ${n_games}`);
+app.get("/style.css", (req, res) => {
+    res.sendFile(__dirname + "/style.css");
 });
 
+// API
+
 app.get("/play", (req, res) => {
-    let id = req.query.room_id;
-    let pass = req.query.pass;
+    let decoded = parseQuery(Buffer.from(req.query.id, "base64").toString());
+    let id = decoded.room_id;
+    let pass = decoded.pass;
 
     if (games[id] === undefined) {
         res.sendFile(__dirname + "/404.html");
@@ -59,24 +44,7 @@ app.get("/board/:room_id", (req, res) => {
     } else {
         res.send(games[id]);
     }
-});
-
-//Join a game if the pass and ids are valid,returns the room_id and the player_id
-app.post("/join", (req, res) => {
-    let id = req.body.room_id;
-
-    if (games[id] === undefined) {
-        res.sendFile(__dirname + "/404.html");
-    } else if (games[id].players === 2 || games[id].pass !== req.body.pass) {
-        res.sendFile(__dirname + "/403.html");
-    } else {
-        games[id].players += 1;
-        console.log(games[id].game);
-
-        games[id].game.setEnemyBoard(req.body.board);
-        res.send({ room_id: id, pass: req.body.pass, player_id: "p2" });
-        console.log("Room joined: " + id);
-    }
+    res.end();
 });
 
 //Return a random board (don't ask me how this works, really complex logic down there)
@@ -90,14 +58,105 @@ app.get("/generate_board", (req, res) => {
     putBoats(board, 2);
     putBoats(board, 3);
 
-    console.log("Board generated");
     res.send({
         board: board,
         cols: game.COLS,
         rows: game.ROWS,
     });
+    res.end();
 });
 
+//Creates a new game, and returns the game id and the player_id
+app.post("/create", (req, res) => {
+    let id =
+        Math.random().toString(36).substring(2, 5) +
+        Math.random().toString(36).substring(2, 5);
+    while (games[id] !== undefined) {
+        id =
+            Math.random().toString(36).substring(2, 5) +
+            Math.random().toString(36).substring(2, 5);
+    }
+    games[id] = {
+        game: new game.Game(req.body.board, []),
+        pass: req.body.pass,
+        cols: game.COLS,
+        rows: game.ROWS,
+        players: 1,
+        currentPlayer: "p1",
+    };
+    res.send({ room_id: id, pass: req.body.pass, player_id: "p1" });
+    n_games++;
+    console.log("Room created:", id);
+    console.log(`Number of rooms: ${n_games}\n`);
+    res.end();
+});
+
+app.post("/shoot", (req, res) => {
+    let id = req.body.room_id;
+    let pass = req.body.pass;
+    let pos = req.body.position;
+    if (pass === games[id].pass && games[id].game.winner === undefined) {
+        if (games[id].currentPlayer == "p1") {
+            games[id].game.shoot2(pos);
+        } else if (games[id].currentPlayer == "p2") {
+            games[id].game.shoot1(pos);
+        }
+        games[id].currentPlayer =
+            games[id].currentPlayer === "p1" ? "p2" : "p1";
+    }
+    res.end();
+});
+
+app.post("/leave", (req, res) => {
+    let id = req.body.room_id;
+    let pass = req.body.pass;
+    let player_id = req.body.player_id;
+
+    if (pass === games[id].pass) {
+        games[id].players--;
+        console.log(`Player ${player_id} left room ${id}`);
+        if (games[id].players === 0) {
+            console.log("Room closed: " + id);
+            console.log(`Number of rooms: ${n_games}\n`);
+            n_games--;
+            delete games[id];
+        } else {
+            if (player_id === "p1") games[id].game.winner = "p2";
+            else games[id].game.winner = "p1";
+        }
+    }
+    res.end();
+});
+
+//Join a game if the pass and ids are valid,returns the room_id and the player_id
+app.post("/join", (req, res) => {
+    let id = req.body.room_id;
+
+    if (games[id] === undefined) {
+        res.sendFile(__dirname + "/404.html");
+    } else if (games[id].players === 2 || games[id].pass !== req.body.pass) {
+        res.sendFile(__dirname + "/403.html");
+    } else {
+        games[id].players += 1;
+
+        games[id].game.setEnemyBoard(req.body.board);
+        res.send({ room_id: id, pass: req.body.pass, player_id: "p2" });
+        console.log("Room joined: " + id + "\n");
+    }
+    res.end();
+});
+
+function parseQuery(queryString) {
+    var query = {};
+    var pairs = (
+        queryString[0] === "?" ? queryString.substr(1) : queryString
+    ).split("&");
+    for (var i = 0; i < pairs.length; i++) {
+        var pair = pairs[i].split("=");
+        query[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1] || "");
+    }
+    return query;
+}
 //Resets the board and returns the board empty (all -1)
 function resetBoard(board) {
     for (let i = 0; i < game.ROWS * game.COLS; i++) {
@@ -152,7 +211,7 @@ function putBoats(board, boatType) {
                 }
 
                 board[randomPosition] = 2;
-                board[randomPosition2] = 2.1;
+                board[randomPosition2] = 2;
             }
             break;
         case 3:
@@ -192,8 +251,8 @@ function putBoats(board, boatType) {
                 }
 
                 board[randomPosition] = 3;
-                board[randomPosition2] = 3.1;
-                board[randomPosition3] = 3.2;
+                board[randomPosition2] = 3;
+                board[randomPosition3] = 3;
             }
             break;
         case 4:
@@ -247,9 +306,9 @@ function putBoats(board, boatType) {
                 }
 
                 board[randomPosition] = 4;
-                board[randomPosition2] = 4.1;
-                board[randomPosition3] = 4.2;
-                board[randomPosition4] = 4.3;
+                board[randomPosition2] = 4;
+                board[randomPosition3] = 4;
+                board[randomPosition4] = 4;
             }
             break;
     }
@@ -340,13 +399,6 @@ function whichBorder(position) {
     }
     return pos;
 }
-
-app.get("/style.css", (req, res) => {
-    res.sendFile(__dirname + "/style.css");
-});
-app.get("/game.js", (req, res) => {
-    // res.sendFile(__dirname + "/game.js");
-});
 
 var port = 3000;
 const server = app

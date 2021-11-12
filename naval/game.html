@@ -11,12 +11,24 @@
     <body>
         <h1>Naval</h1>
         <label id="room_id"></label>
+        <label id="room_pass"></label>
+        <label id="status"></label>
         <div id="container">
             <div id="my-board"></div>
             <div id="enemy-board"></div>
         </div>
 
         <script>
+            var query = parseQuery(window.location.search);
+            var currentPlayer;
+            var gameOver = false;
+            query = parseQuery(atob(query.id));
+
+            document.getElementById("room_id").innerHTML =
+                "Room ID: " + query.room_id;
+            document.getElementById("room_pass").innerHTML =
+                "Room pass: " + query.pass;
+
             function parseQuery(queryString) {
                 var query = {};
                 var pairs = (
@@ -31,50 +43,147 @@
                 return query;
             }
 
-            var query = parseQuery(window.location.search);
-            document.getElementById("room_id").innerHTML =
-                "Room ID: " + query.room_id;
             function getGame() {
                 axios.get("/board/" + query.room_id).then((response) => {
-                    setBoard(
-                        "my-board",
-                        response.data.game.myBoard,
-                        response.data.cols,
-                        response.data.rows
-                    );
-                    setBoard(
-                        "enemy-board",
-                        response.data.game.enemyBoard,
-                        response.data.cols,
-                        response.data.rows
-                    );
+                    currentPlayer = response.data.currentPlayer;
+                    console.log(response.data);
+                    if (response.data.game.winner !== undefined) {
+                        if (response.data.game.winner === query.player_id) {
+                            document.getElementById("status").innerHTML =
+                                "You won!";
+                        } else {
+                            document.getElementById("status").innerHTML =
+                                "You lost!";
+                        }
+                        gameOver = true;
+                    } else {
+                        if (response.data.players === 1) {
+                            document.getElementById("status").innerHTML =
+                                "Waiting for another player";
+                        } else if (currentPlayer === query.player_id) {
+                            document.getElementById("status").innerHTML =
+                                "Your turn";
+                        } else {
+                            document.getElementById("status").innerHTML =
+                                "Opponent's turn";
+                        }
+                    }
+
+                    if (query.player_id === "p1") {
+                        setBoard(
+                            "my-board",
+                            response.data.game.board1,
+                            response.data.cols,
+                            response.data.rows
+                        );
+                        setBoard(
+                            "enemy-board",
+                            response.data.game.board2,
+                            response.data.cols,
+                            response.data.rows
+                        );
+                    } else {
+                        setBoard(
+                            "my-board",
+                            response.data.game.board2,
+                            response.data.cols,
+                            response.data.rows
+                        );
+                        setBoard(
+                            "enemy-board",
+                            response.data.game.board1,
+                            response.data.cols,
+                            response.data.rows
+                        );
+                    }
                 });
             }
 
             function performShoot(index, board_id) {
-                console.log("Shoot at " + index + " on " + board_id);
+                if (currentPlayer === query.player_id) {
+                    axios.post("/shoot", {
+                        room_id: query.room_id,
+                        pass: query.pass,
+                        position: index,
+                    });
+                } else {
+                    if (gameOver) {
+                        return;
+                    }
+                    alert("Wait for your turn");
+                }
             }
+
             function setBoard(id, board, board_cols, board_rows) {
                 var html = "<table cellpadding=0 cellspacing=0>";
                 for (let row = 0; row < board_rows; row++) {
                     html += "<tr>";
                     for (let column = 0; column < board_cols; column++) {
                         const pixelIndex = column + board_cols * row;
-                        html += `<td onclick="performShoot(${pixelIndex},'${id}')">`;
-                        html += `<div class="pixel-index">${pixelIndex}</div>`;
-                        if (board[pixelIndex] != -1)
-                            html += `${board[pixelIndex]}`;
 
+                        switch (board[pixelIndex]) {
+                            case -1: //empty
+                                if (id === "my-board") {
+                                    html += `<td>`;
+                                } else
+                                    html += `<td class="enemy-cell" onclick="performShoot(${pixelIndex},'${id}')">`;
+                                break;
+
+                            case 1: //ships
+                            case 2:
+                            case 3:
+                            case 4:
+                                if (id === "my-board") {
+                                    html += `<td>`;
+                                    html += `${board[pixelIndex]}`; //boat
+                                } else {
+                                    html += `<td class="enemy-cell" onclick="performShoot(${pixelIndex},'${id}')">`;
+                                    if (gameOver)
+                                        html += `${board[pixelIndex]}`; //boat
+                                }
+                                break;
+                            case -2: //missed
+                                html += `<td class="missed-cell" onclick="performShoot(${pixelIndex},'${id}')">`;
+                                html += "*";
+                                break;
+
+                            case -3: //hit
+                                html += `<td class="hitted-cell" onclick="performShoot(${pixelIndex},'${id}')">`;
+                                html += "X";
+
+                                break;
+                        }
+
+                        html += `<div class="pixel-index">${pixelIndex}</div>`;
                         html += "</td>";
                     }
                     html += "</tr>";
                 }
                 html += "</table>";
+
                 document.getElementById(id).innerHTML = html;
             }
 
+            window.onhashchange = function () {
+                axios.post("/leave", {
+                    room_id: query.room_id,
+                    pass: query.pass,
+                    player_id: query.player_id,
+                });
+            };
+
+            window.onunload = function () {
+                axios.post("/leave", {
+                    room_id: query.room_id,
+                    pass: query.pass,
+                    player_id: query.player_id,
+                });
+
+                return "bye";
+            };
+
             getGame();
-            // setInterval(getGame, 1000);
+            setInterval(getGame, 1000);
         </script>
     </body>
 </html>

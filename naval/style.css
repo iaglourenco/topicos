@@ -25,6 +25,10 @@ label {
     margin-top: 10px;
 }
 
+label {
+    width: auto;
+}
+
 .create-board-header {
     width: 500px;
     display: flex;
@@ -79,6 +83,19 @@ td {
     font-family: monospace;
     font-size: 18px;
     position: relative;
+}
+
+.missed-cell {
+    background: rgb(49, 80, 255);
+    color: white;
+}
+.hitted-cell {
+    background: red;
+    color: black;
+}
+.enemy-cell:hover {
+    background: rgb(255, 129, 129);
+    cursor: crosshair;
 }
 
 .pixel-index {
