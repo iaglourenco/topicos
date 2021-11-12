@@ -96,13 +96,31 @@ app.post("/shoot", (req, res) => {
     let pass = req.body.pass;
     let pos = req.body.position;
     if (pass === games[id].pass && games[id].game.winner === undefined) {
+        let result;
         if (games[id].currentPlayer == "p1") {
-            games[id].game.shoot2(pos);
+            result = games[id].game.shoot2(pos);
         } else if (games[id].currentPlayer == "p2") {
-            games[id].game.shoot1(pos);
+            result = games[id].game.shoot1(pos);
         }
-        games[id].currentPlayer =
-            games[id].currentPlayer === "p1" ? "p2" : "p1";
+        if (result === -2)
+            games[id].currentPlayer =
+                games[id].currentPlayer === "p1" ? "p2" : "p1";
+
+        if (
+            !games[id].game.board1.includes(1) &&
+            !games[id].game.board1.includes(2) &&
+            !games[id].game.board1.includes(3) &&
+            !games[id].game.board1.includes(4)
+        ) {
+            games[id].game.winner = "p2";
+        } else if (
+            !games[id].game.board2.includes(1) &&
+            !games[id].game.board2.includes(2) &&
+            !games[id].game.board2.includes(3) &&
+            !games[id].game.board2.includes(4)
+        ) {
+            games[id].game.winner = "p1";
+        }
     }
     res.end();
 });
@@ -116,14 +134,54 @@ app.post("/leave", (req, res) => {
         games[id].players--;
         console.log(`Player ${player_id} left room ${id}`);
         if (games[id].players === 0) {
-            console.log("Room closed: " + id);
-            console.log(`Number of rooms: ${n_games}\n`);
             n_games--;
             delete games[id];
+            console.log("Room closed: " + id);
+            console.log(`Number of rooms: ${n_games}\n`);
         } else {
             if (player_id === "p1") games[id].game.winner = "p2";
             else games[id].game.winner = "p1";
+            games[id].game.wo = true;
         }
+    }
+    res.end();
+});
+
+app.post("/play_again", (req, res) => {
+    let id = req.body.room_id;
+    let pass = req.body.pass;
+
+    if (pass === games[id].pass) {
+        console.log("reset");
+
+        games[id].game.board1 = [];
+        games[id].game.board2 = [];
+        games[id].game.board1 = resetBoard(games[id].game.board1);
+        games[id].game.board2 = resetBoard(games[id].game.board2);
+        games[id].game.winner = undefined;
+        games[id].currentPlayer = "p1";
+        console.log("boat4");
+        games[id].game.board1 = putBoats(games[id].game.board1, 4);
+        console.log("boat3");
+
+        games[id].game.board1 = putBoats(games[id].game.board1, 1);
+        console.log("boat2");
+        games[id].game.board1 = putBoats(games[id].game.board1, 2);
+        console.log("boat1");
+        games[id].game.board1 = putBoats(games[id].game.board1, 3);
+
+        if (!games[id].game.wo) {
+            console.log("boat2");
+
+            games[id].game.board2 = putBoats(games[id].game.board2, 4);
+            games[id].game.board2 = putBoats(games[id].game.board2, 1);
+            games[id].game.board2 = putBoats(games[id].game.board2, 2);
+            games[id].game.board2 = putBoats(games[id].game.board2, 3);
+        } else {
+            games[id].game.wo = false;
+        }
+
+        console.log("Room reset: " + id);
     }
     res.end();
 });
@@ -298,7 +356,7 @@ function putBoats(board, boatType) {
                     randomPosition2 = randomPosition + selectedDirection;
                     randomPosition3 = randomPosition2 + selectedDirection;
                     randomPosition4 = randomPosition3 + selectedDirection;
-
+                    loopCount++;
                     if (loopCount >= 10000) {
                         console.log("Infinite loop detected");
                         return board;

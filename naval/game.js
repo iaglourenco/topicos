@@ -5,6 +5,7 @@ class Game {
     constructor(board1, board2) {
         this.board1 = board1;
         this.board2 = board2;
+        this.wo = false; // WO win?
         this.winner = undefined;
     }
 
@@ -28,26 +29,26 @@ class Game {
         switch (this.board1[pos]) {
             case -1:
                 this.board1[pos] = -2;
-                break;
+                return -2;
             case 1:
             case 2:
             case 3:
             case 4:
                 this.board1[pos] = -3;
-                break;
+                return -3;
         }
     }
     shoot2(pos) {
         switch (this.board2[pos]) {
             case -1:
                 this.board2[pos] = -2;
-                break;
+                return -2;
             case 1:
             case 2:
             case 3:
             case 4:
                 this.board2[pos] = -3;
-                break;
+                return -3;
         }
     }
 }

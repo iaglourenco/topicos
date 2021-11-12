@@ -2,6 +2,7 @@
 <html lang="en">
     <head>
         <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
         <link rel="stylesheet" href="style.css" />
         <meta charset="UTF-8" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -17,6 +18,8 @@
             <div id="my-board"></div>
             <div id="enemy-board"></div>
         </div>
+        <a hidden id="play_again" onclick="playAgain()">Play again</a>
+        <a id="leave" onclick="leaveGame()">Leave room</a>
 
         <script>
             var query = parseQuery(window.location.search);
@@ -46,11 +49,17 @@
             function getGame() {
                 axios.get("/board/" + query.room_id).then((response) => {
                     currentPlayer = response.data.currentPlayer;
+                    document.getElementById("play_again").hidden = !gameOver;
+
                     console.log(response.data);
                     if (response.data.game.winner !== undefined) {
                         if (response.data.game.winner === query.player_id) {
-                            document.getElementById("status").innerHTML =
-                                "You won!";
+                            if (response.data.game.wo) {
+                                document.getElementById("status").innerHTML =
+                                    "Other player left, you won!";
+                            } else
+                                document.getElementById("status").innerHTML =
+                                    "You won!";
                         } else {
                             document.getElementById("status").innerHTML =
                                 "You lost!";
@@ -164,21 +173,30 @@
                 document.getElementById(id).innerHTML = html;
             }
 
-            window.onhashchange = function () {
+            function playAgain() {
+                axios
+                    .post("/play_again", {
+                        room_id: query.room_id,
+                        pass: query.pass,
+                    })
+                    .then((res) => {
+                        gameOver = false;
+                    });
+            }
+            function leaveGame() {
                 axios.post("/leave", {
                     room_id: query.room_id,
                     pass: query.pass,
                     player_id: query.player_id,
                 });
+                window.location.href = "/";
+            }
+            window.onhashchange = function () {
+                leaveGame();
             };
 
             window.onunload = function () {
-                axios.post("/leave", {
-                    room_id: query.room_id,
-                    pass: query.pass,
-                    player_id: query.player_id,
-                });
-
+                leaveGame();
                 return "bye";
             };
 
