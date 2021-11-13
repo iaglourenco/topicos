@@ -30,7 +30,11 @@ app.get("/play", (req, res) => {
 
     if (games[id] === undefined) {
         res.sendFile(__dirname + "/404.html");
-    } else if (games[id].pass !== pass) {
+    } else if (
+        (games[id].game.winner !== undefined &&
+            games[id].game.winner !== decoded.player_id) ||
+        games[id].pass !== pass
+    ) {
         res.sendFile(__dirname + "/403.html");
     } else {
         res.sendFile(__dirname + "/game.html");
@@ -161,13 +165,12 @@ app.post("/play_again", (req, res) => {
         games[id].game.winner = undefined;
 
         if (games[id].game.wo === "p1") {
-            // Player 1 leave
             games[id].game.board2 = putBoats(games[id].game.board2, 4);
             games[id].game.board2 = putBoats(games[id].game.board2, 1);
             games[id].game.board2 = putBoats(games[id].game.board2, 2);
             games[id].game.board2 = putBoats(games[id].game.board2, 3);
-        } else {
-            // Player 2 leave
+        }
+        if (games[id].game.wo === "p2" || games[id].players === 2) {
             games[id].game.board1 = putBoats(games[id].game.board1, 4);
             games[id].game.board1 = putBoats(games[id].game.board1, 1);
             games[id].game.board1 = putBoats(games[id].game.board1, 2);
@@ -185,13 +188,19 @@ app.post("/join", (req, res) => {
     let id = req.body.room_id;
 
     if (games[id] === undefined) {
-        res.sendFile(__dirname + "/404.html");
+        res.send({
+            room_id: id,
+            error: "404",
+        });
     } else if (
         games[id].players === 2 ||
         games[id].pass !== req.body.pass ||
         games[id].game.winner !== undefined
     ) {
-        res.sendFile(__dirname + "/403.html");
+        res.send({
+            room_id: id,
+            error: "403",
+        });
     } else {
         games[id].players += 1;
         games[id].game.setEnemyBoard(req.body.board);

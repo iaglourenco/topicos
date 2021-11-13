@@ -88,6 +88,9 @@
                         board: myBoard,
                     })
                     .then((res) => {
+                        if (res.data.error !== undefined) {
+                            pass = res.data.error;
+                        }
                         let encoded = window.btoa(
                             "?room_id=" +
                                 res.data.room_id +

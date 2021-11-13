@@ -145,10 +145,11 @@
                                     html += `<td class="boat">`;
                                     //html += `${board[pixelIndex]}`; //boat
                                 } else {
-                                    html += `<td class="enemy-cell" onclick="performShoot(${pixelIndex},'${id}')">`;
                                     if (gameOver) {
                                         html += `<td class="boat">`;
                                         // html += `${board[pixelIndex]}`; //boat
+                                    } else {
+                                        html += `<td class="enemy-cell" onclick="performShoot(${pixelIndex},'${id}')">`;
                                     }
                                 }
                                 break;
@@ -163,8 +164,8 @@
 
                                 break;
                         }
-
                         html += `<div class="pixel-index">${pixelIndex}</div>`;
+
                         html += "</td>";
                     }
                     html += "</tr>";
