@@ -51,7 +51,6 @@
                     currentPlayer = response.data.currentPlayer;
                     document.getElementById("play_again").hidden = !gameOver;
 
-                    console.log(response.data);
                     if (response.data.game.winner !== undefined) {
                         if (response.data.game.winner === query.player_id) {
                             if (response.data.game.wo) {
@@ -143,12 +142,14 @@
                             case 3:
                             case 4:
                                 if (id === "my-board") {
-                                    html += `<td>`;
-                                    html += `${board[pixelIndex]}`; //boat
+                                    html += `<td class="boat">`;
+                                    //html += `${board[pixelIndex]}`; //boat
                                 } else {
                                     html += `<td class="enemy-cell" onclick="performShoot(${pixelIndex},'${id}')">`;
-                                    if (gameOver)
-                                        html += `${board[pixelIndex]}`; //boat
+                                    if (gameOver) {
+                                        html += `<td class="boat">`;
+                                        // html += `${board[pixelIndex]}`; //boat
+                                    }
                                 }
                                 break;
                             case -2: //missed

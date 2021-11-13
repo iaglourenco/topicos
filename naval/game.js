@@ -5,7 +5,7 @@ class Game {
     constructor(board1, board2) {
         this.board1 = board1;
         this.board2 = board2;
-        this.wo = false; // WO win?
+        this.wo = undefined; // WO win?
         this.winner = undefined;
     }
 

@@ -84,17 +84,21 @@ td {
     font-size: 18px;
     position: relative;
 }
-
+.boat {
+    border: 2px solid #00f;
+    background: rgba(0, 0, 255, 0.1);
+}
 .missed-cell {
-    background: rgb(49, 80, 255);
+    background: rgb(49, 173, 255);
     color: white;
 }
 .hitted-cell {
-    background: red;
+    border: 2px solid red;
+    background: rgba(255, 0, 0, 0.1);
     color: black;
 }
 .enemy-cell:hover {
-    background: rgb(255, 129, 129);
+    background: rgba(255, 129, 129, 0.5);
     cursor: crosshair;
 }
 

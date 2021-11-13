@@ -130,6 +130,7 @@ app.post("/leave", (req, res) => {
     let pass = req.body.pass;
     let player_id = req.body.player_id;
 
+    if (games[id] === undefined) return;
     if (pass === games[id].pass) {
         games[id].players--;
         console.log(`Player ${player_id} left room ${id}`);
@@ -139,9 +140,10 @@ app.post("/leave", (req, res) => {
             console.log("Room closed: " + id);
             console.log(`Number of rooms: ${n_games}\n`);
         } else {
-            if (player_id === "p1") games[id].game.winner = "p2";
-            else games[id].game.winner = "p1";
-            games[id].game.wo = true;
+            if (player_id === "p1")
+                games[id].currentPlayer = games[id].game.winner = "p2";
+            else games[id].currentPlayer = games[id].game.winner = "p1";
+            games[id].game.wo = player_id;
         }
     }
     res.end();
@@ -152,34 +154,26 @@ app.post("/play_again", (req, res) => {
     let pass = req.body.pass;
 
     if (pass === games[id].pass) {
-        console.log("reset");
-
         games[id].game.board1 = [];
         games[id].game.board2 = [];
         games[id].game.board1 = resetBoard(games[id].game.board1);
         games[id].game.board2 = resetBoard(games[id].game.board2);
         games[id].game.winner = undefined;
-        games[id].currentPlayer = "p1";
-        console.log("boat4");
-        games[id].game.board1 = putBoats(games[id].game.board1, 4);
-        console.log("boat3");
 
-        games[id].game.board1 = putBoats(games[id].game.board1, 1);
-        console.log("boat2");
-        games[id].game.board1 = putBoats(games[id].game.board1, 2);
-        console.log("boat1");
-        games[id].game.board1 = putBoats(games[id].game.board1, 3);
-
-        if (!games[id].game.wo) {
-            console.log("boat2");
-
+        if (games[id].game.wo === "p1") {
+            // Player 1 leave
             games[id].game.board2 = putBoats(games[id].game.board2, 4);
             games[id].game.board2 = putBoats(games[id].game.board2, 1);
             games[id].game.board2 = putBoats(games[id].game.board2, 2);
             games[id].game.board2 = putBoats(games[id].game.board2, 3);
         } else {
-            games[id].game.wo = false;
+            // Player 2 leave
+            games[id].game.board1 = putBoats(games[id].game.board1, 4);
+            games[id].game.board1 = putBoats(games[id].game.board1, 1);
+            games[id].game.board1 = putBoats(games[id].game.board1, 2);
+            games[id].game.board1 = putBoats(games[id].game.board1, 3);
         }
+        games[id].game.wo = undefined;
 
         console.log("Room reset: " + id);
     }
@@ -192,13 +186,20 @@ app.post("/join", (req, res) => {
 
     if (games[id] === undefined) {
         res.sendFile(__dirname + "/404.html");
-    } else if (games[id].players === 2 || games[id].pass !== req.body.pass) {
+    } else if (
+        games[id].players === 2 ||
+        games[id].pass !== req.body.pass ||
+        games[id].game.winner !== undefined
+    ) {
         res.sendFile(__dirname + "/403.html");
     } else {
         games[id].players += 1;
-
         games[id].game.setEnemyBoard(req.body.board);
-        res.send({ room_id: id, pass: req.body.pass, player_id: "p2" });
+        res.send({
+            room_id: id,
+            pass: req.body.pass,
+            player_id: games[id].currentPlayer === "p1" ? "p2" : "p1",
+        });
         console.log("Room joined: " + id + "\n");
     }
     res.end();

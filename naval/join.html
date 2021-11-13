@@ -46,10 +46,14 @@
                                 column++
                             ) {
                                 const pixelIndex = column + res.data.cols * row;
-                                html += "<td>";
+                                if (myBoard[pixelIndex] != -1) {
+                                    html += "<td class='boat'>";
+                                    // html += `${myBoard[pixelIndex]}`;
+                                } else {
+                                    html += "<td>";
+                                }
+
                                 html += `<div class="pixel-index">${pixelIndex}</div>`;
-                                if (myBoard[pixelIndex] != -1)
-                                    html += `${myBoard[pixelIndex]}`;
 
                                 html += "</td>";
                             }
